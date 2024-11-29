@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
@@ -12,21 +12,25 @@ export function GenreMusicCharacteristics({ data }) {
     'instrumentalness', 'liveness', 'speechiness'
   ]
 
-  const genres = [...new Set(data.map(song => song.genre))]
+  const genres = useMemo(() => [...new Set(data.map(song => song.genre))], [data])
 
-  const genreCharacteristics = genres.reduce((acc, genre) => {
-    const genreSongs = data.filter(song => song.genre === genre)
-    acc[genre] = characteristics.reduce((charAcc, char) => {
-      charAcc[char] = genreSongs.reduce((sum, song) => sum + song[char], 0) / genreSongs.length
-      return charAcc
+  const genreCharacteristics = useMemo(() => {
+    return genres.reduce((acc, genre) => {
+      const genreSongs = data.filter(song => song.genre === genre)
+      acc[genre] = characteristics.reduce((charAcc, char) => {
+        charAcc[char] = genreSongs.reduce((sum, song) => sum + song[char], 0) / genreSongs.length
+        return charAcc
+      }, {})
+      return acc
     }, {})
-    return acc
-  }, {})
+  }, [data, genres, characteristics])
 
-  const chartData = characteristics.map(char => ({
-    characteristic: char,
-    ...(selectedGenre ? { [selectedGenre]: genreCharacteristics[selectedGenre][char] } : {})
-  }))
+  const chartData = useMemo(() => {
+    return characteristics.map(char => ({
+      characteristic: char,
+      ...(selectedGenre ? { [selectedGenre]: genreCharacteristics[selectedGenre][char] } : {})
+    }))
+  }, [selectedGenre, genreCharacteristics, characteristics])
 
   return (
     <Card>
@@ -72,4 +76,3 @@ export function GenreMusicCharacteristics({ data }) {
     </Card>
   )
 }
-

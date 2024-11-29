@@ -1,36 +1,24 @@
-"use client";
-
-import { useState } from "react";
-import { ResponsiveHeatMap } from "@nivo/heatmap";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer } from "@/components/ui/chart";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import React, { useState, useMemo } from 'react'
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function MonthlyStreamingActivity({ data }) {
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString())
 
-  // Compute monthly data
-  const monthlyData = data.reduce((acc, song) => {
-    const year = song.released_date.getFullYear();
-    const month = song.released_date.getMonth();
-    if (year.toString() === selectedYear) {
-      acc[month] = (acc[month] || 0) + song.streams;
-    }
-    return acc;
-  }, {});
+  const years = useMemo(() => [...new Set(data.map(song => song.released_date.getFullYear()))].sort(), [data])
 
-  // Create data in the format Nivo HeatMap expects
-  const chartData = [
-    {
-      id: 'Streams',
-      data: Array.from({ length: 12 }, (_, i) => ({
-        x: new Date(2000, i, 1).toLocaleString("default", { month: "short" }),
-        y: monthlyData[i] || 0
-      }))
-    }
-  ];
-
-  const years = [...new Set(data.map((song) => song.released_date.getFullYear()))].sort();
+  const monthlyData = useMemo(() => {
+    const filteredData = data.filter(song => song.released_date.getFullYear().toString() === selectedYear)
+    return Array.from({ length: 12 }, (_, month) => {
+      const monthData = filteredData.filter(song => song.released_date.getMonth() === month)
+      return {
+        month: new Date(2000, month, 1).toLocaleString('default', { month: 'short' }),
+        streams: monthData.reduce((sum, song) => sum + song.streams, 0)
+      }
+    })
+  }, [data, selectedYear])
 
   return (
     <Card>
@@ -42,10 +30,8 @@ export function MonthlyStreamingActivity({ data }) {
             <SelectValue placeholder="Select year" />
           </SelectTrigger>
           <SelectContent>
-            {years.map((year) => (
-              <SelectItem key={year} value={year.toString()}>
-                {year}
-              </SelectItem>
+            {years.map(year => (
+              <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -60,43 +46,17 @@ export function MonthlyStreamingActivity({ data }) {
           }}
           className="h-[300px]"
         >
-          <ResponsiveHeatMap
-            data={chartData}
-            keys={['Streams']}
-            indexBy="x"
-            margin={{ top: 20, right: 0, bottom: 60, left: 80 }}
-            forceSquare={true}
-            axisTop={null}
-            axisRight={null}
-            axisBottom={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: -90,
-              legend: "Month",
-              legendPosition: "middle",
-              legendOffset: 36,
-            }}
-            axisLeft={{
-              tickSize: 5,
-              tickPadding: 5,
-              tickRotation: 0,
-              legend: "Streams",
-              legendPosition: "middle",
-              legendOffset: -72,
-            }}
-            colors={{
-              type: 'sequential',
-              colors: ['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b']
-            }}
-            cellOpacity={1}
-            cellBorderWidth={1}
-            cellBorderColor={{ from: "color", modifiers: [["darker", 0.4]] }}
-            animate={true}
-            motionStiffness={80}
-            motionDamping={9}
-          />
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={monthlyData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="streams" fill="var(--color-streams)" />
+            </BarChart>
+          </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
     </Card>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   Select,
   SelectContent,
@@ -13,12 +13,13 @@ export function FilterBar({ data, filters, setFilters }) {
   const [genres, setGenres] = useState([])
   const [artists, setArtists] = useState([])
 
+  const uniqueGenres = useMemo(() => [...new Set(data.map(song => song.genre))], [data])
+  const uniqueArtists = useMemo(() => [...new Set(data.map(song => song.artist_name))], [data])
+
   useEffect(() => {
-    const uniqueGenres = [...new Set(data.map(song => song.genre))]
-    const uniqueArtists = [...new Set(data.map(song => song.artist_name))]
     setGenres(uniqueGenres)
     setArtists(uniqueArtists)
-  }, [data])
+  }, [uniqueGenres, uniqueArtists])
 
   const handleReset = () => {
     setFilters({
@@ -34,7 +35,7 @@ export function FilterBar({ data, filters, setFilters }) {
       <div className="w-full md:w-auto">
         <Select
           value={filters.genre}
-          onValueChange={(value) => setFilters({ ...filters, genre: value })}
+          onValueChange={(value) => setFilters(prev => ({ ...prev, genre: value }))}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select Genre" />
@@ -50,7 +51,7 @@ export function FilterBar({ data, filters, setFilters }) {
       <div className="w-full md:w-auto">
         <Select
           value={filters.artist}
-          onValueChange={(value) => setFilters({ ...filters, artist: value })}
+          onValueChange={(value) => setFilters(prev => ({ ...prev, artist: value }))}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select Artist" />
@@ -67,7 +68,7 @@ export function FilterBar({ data, filters, setFilters }) {
         <Input
           type="date"
           value={filters.startDate}
-          onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+          onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
           placeholder="Start Date"
         />
       </div>
@@ -75,7 +76,7 @@ export function FilterBar({ data, filters, setFilters }) {
         <Input
           type="date"
           value={filters.endDate}
-          onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+          onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
           placeholder="End Date"
         />
       </div>
@@ -83,4 +84,3 @@ export function FilterBar({ data, filters, setFilters }) {
     </div>
   )
 }
-
