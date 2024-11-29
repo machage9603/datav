@@ -1,13 +1,11 @@
-"use client"
-
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function GenreMusicCharacteristics({ data }) {
-  const [selectedGenres, setSelectedGenres] = useState([])
+  const [selectedGenre, setSelectedGenre] = useState("")
 
   const characteristics = [
     'danceability', 'valence', 'energy', 'acousticness',
@@ -27,15 +25,8 @@ export function GenreMusicCharacteristics({ data }) {
 
   const chartData = characteristics.map(char => ({
     characteristic: char,
-    ...selectedGenres.reduce((acc, genre) => {
-      acc[genre] = genreCharacteristics[genre][char]
-      return acc
-    }, {})
+    ...(selectedGenre ? { [selectedGenre]: genreCharacteristics[selectedGenre][char] } : {})
   }))
-
-  const handleGenreChange = (value) => {
-    setSelectedGenres(value)
-  }
 
   return (
     <Card>
@@ -43,12 +34,11 @@ export function GenreMusicCharacteristics({ data }) {
         <CardTitle>Genre Music Characteristics</CardTitle>
         <CardDescription>Compare music features across genres</CardDescription>
         <Select
-          multiple
-          value={selectedGenres}
-          onValueChange={handleGenreChange}
+          value={selectedGenre}
+          onValueChange={setSelectedGenre}
         >
-          <SelectTrigger>
-            <SelectValue placeholder="Select genres" />
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a genre" />
           </SelectTrigger>
           <SelectContent>
             {genres.map(genre => (
@@ -64,16 +54,15 @@ export function GenreMusicCharacteristics({ data }) {
               <PolarGrid />
               <PolarAngleAxis dataKey="characteristic" />
               <PolarRadiusAxis angle={30} domain={[0, 100]} />
-              {selectedGenres.map((genre, index) => (
+              {selectedGenre && (
                 <Radar
-                  key={genre}
-                  name={genre}
-                  dataKey={genre}
-                  stroke={`hsl(${index * 60}, 70%, 50%)`}
-                  fill={`hsl(${index * 60}, 70%, 50%)`}
+                  name={selectedGenre}
+                  dataKey={selectedGenre}
+                  stroke={`hsl(${genres.indexOf(selectedGenre) * 60}, 70%, 50%)`}
+                  fill={`hsl(${genres.indexOf(selectedGenre) * 60}, 70%, 50%)`}
                   fillOpacity={0.6}
                 />
-              ))}
+              )}
               <ChartTooltip content={<ChartTooltipContent />} />
               <Legend />
             </RadarChart>

@@ -7,7 +7,7 @@ export function useSpotifyData() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetch('/data/smss.csv')
+    fetch('../data/smss.csv')
       .then(response => response.text())
       .then(csvString => {
         Papa.parse(csvString, {
