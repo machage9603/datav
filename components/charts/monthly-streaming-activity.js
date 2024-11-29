@@ -5,33 +5,70 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function MonthlyStreamingActivity({ data }) {
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString())
+  // Ensure data is an array and not empty
+  const validData = useMemo(() =>
+    Array.isArray(data) ? data.filter(song => song && song.released_date) : [],
+    [data]
+  )
 
-  const years = useMemo(() => [...new Set(data.map(song => song.released_date.getFullYear()))].sort(), [data])
+  const years = useMemo(() => {
+    const uniqueYears = [...new Set(
+      validData
+        .map(song => song.released_date.getFullYear())
+        .filter(year => year != null && !isNaN(year))
+    )].sort()
+    return uniqueYears
+  }, [validData])
+
+  // Safely select initial year
+  const [selectedYear, setSelectedYear] = useState(() =>
+    years.length > 0 ? years[years.length - 1].toString() : ''
+  )
 
   const monthlyData = useMemo(() => {
-    const filteredData = data.filter(song => song.released_date.getFullYear().toString() === selectedYear)
+    if (!selectedYear) return []
+
+    const filteredData = validData.filter(song =>
+      song.released_date.getFullYear().toString() === selectedYear
+    )
+
     return Array.from({ length: 12 }, (_, month) => {
-      const monthData = filteredData.filter(song => song.released_date.getMonth() === month)
+      const monthData = filteredData.filter(song =>
+        song.released_date.getMonth() === month
+      )
+
       return {
         month: new Date(2000, month, 1).toLocaleString('default', { month: 'short' }),
-        streams: monthData.reduce((sum, song) => sum + song.streams, 0)
+        streams: monthData.reduce((sum, song) => sum + (Number(song.streams) || 0), 0)
       }
     })
-  }, [data, selectedYear])
+  }, [validData, selectedYear])
+
+  // If no years are available, return null or a placeholder
+  if (years.length === 0) {
+    return null
+  }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Monthly Streaming Activity</CardTitle>
         <CardDescription>Streams by month for selected year</CardDescription>
-        <Select value={selectedYear} onValueChange={setSelectedYear}>
+        <Select
+          value={selectedYear || ''}
+          onValueChange={setSelectedYear}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select year" />
           </SelectTrigger>
           <SelectContent>
-            {years.map(year => (
-              <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+            {years.map((year, index) => (
+              <SelectItem
+                key={`year-${year}-${index}`}
+                value={year.toString()}
+              >
+                {String(year)}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>

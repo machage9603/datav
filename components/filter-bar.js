@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import {
   Select,
   SelectContent,
@@ -10,16 +10,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export function FilterBar({ data, filters, setFilters }) {
-  const [genres, setGenres] = useState([])
-  const [artists, setArtists] = useState([])
+  // Use stable memoized values with unique keys
+  const genres = useMemo(() => {
+    const uniqueGenres = ['All Genres', ...new Set(data.map(song => song.genre))];
+    return uniqueGenres.filter(genre => genre != null);
+  }, [data]);
 
-  const uniqueGenres = useMemo(() => [...new Set(data.map(song => song.genre))], [data])
-  const uniqueArtists = useMemo(() => [...new Set(data.map(song => song.artist_name))], [data])
-
-  useEffect(() => {
-    setGenres(uniqueGenres)
-    setArtists(uniqueArtists)
-  }, [uniqueGenres, uniqueArtists])
+  const artists = useMemo(() => {
+    const uniqueArtists = ['All Artists', ...new Set(data.map(song => song.artist_name))];
+    return uniqueArtists.filter(artist => artist != null);
+  }, [data]);
 
   const handleReset = () => {
     setFilters({
@@ -27,7 +27,7 @@ export function FilterBar({ data, filters, setFilters }) {
       artist: 'All Artists',
       startDate: '',
       endDate: ''
-    })
+    });
   }
 
   return (
@@ -41,9 +41,13 @@ export function FilterBar({ data, filters, setFilters }) {
             <SelectValue placeholder="Select Genre" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="All Genres">All Genres</SelectItem>
-            {genres.map(genre => (
-              <SelectItem key={genre} value={genre}>{genre}</SelectItem>
+            {genres.map((genre, index) => (
+              <SelectItem
+                key={`genre-${genre}-${index}`}
+                value={genre}
+              >
+                {genre}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -57,9 +61,13 @@ export function FilterBar({ data, filters, setFilters }) {
             <SelectValue placeholder="Select Artist" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="All Artists">All Artists</SelectItem>
-            {artists.map(artist => (
-              <SelectItem key={artist} value={artist}>{artist}</SelectItem>
+            {artists.map((artist, index) => (
+              <SelectItem
+                key={`artist-${artist}-${index}`}
+                value={artist}
+              >
+                {artist}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>

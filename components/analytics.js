@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { FilterBar } from './filter-bar'
 import { StreamingTrends } from './charts/streaming-trends'
 import { TopArtists } from './charts/top-artists'
@@ -21,15 +21,23 @@ export function Analytics() {
     endDate: ''
   })
 
+  // Memoize filtered data to prevent unnecessary re-renders
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+
+    return data.filter(song => {
+      const meetsGenre = filters.genre === 'All Genres' || song.genre === filters.genre;
+      const meetsArtist = filters.artist === 'All Artists' || song.artist_name === filters.artist;
+      const meetsStartDate = !filters.startDate || new Date(song.released_date) >= new Date(filters.startDate);
+      const meetsEndDate = !filters.endDate || new Date(song.released_date) <= new Date(filters.endDate);
+
+      return meetsGenre && meetsArtist && meetsStartDate && meetsEndDate;
+    });
+  }, [data, filters]);
+
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error: {error.message}</div>
-
-  const filteredData = data.filter(song =>
-    (filters.genre === 'All Genres' || song.genre === filters.genre) &&
-    (filters.artist === 'All Artists' || song.artist_name === filters.artist) &&
-    (!filters.startDate || new Date(song.released_date) >= new Date(filters.startDate)) &&
-    (!filters.endDate || new Date(song.released_date) <= new Date(filters.endDate))
-  )
+  if (!data) return <div>No data available</div>
 
   return (
     <div className="space-y-8">
@@ -47,4 +55,3 @@ export function Analytics() {
     </div>
   )
 }
-
