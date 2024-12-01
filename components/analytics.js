@@ -4,7 +4,7 @@ import React, { useState, useMemo } from 'react'
 import { FilterBar } from './filter-bar'
 import { StreamingTrends } from './charts/streaming-trends'
 import { TopArtists } from './charts/top-artists'
-import { GenreDistribution } from './charts/genre-distribution'
+import { PlaylistDistribution } from './charts/playlist-distribution'
 import { BPMVsStreams } from './charts/bpm-vs-streams'
 import { MonthlyStreamingActivity } from './charts/monthly-streaming-activity'
 import { MusicCharacteristics } from './charts/music-characteristics'
@@ -44,7 +44,7 @@ export function Analytics() {
       <div className="grid md:grid-cols-2 gap-8">
         <StreamingTrends data={filteredData} />
         <TopArtists data={filteredData} />
-        <GenreDistribution data={filteredData} />
+        <PlaylistDistribution data={filteredData} />
         <BPMVsStreams data={filteredData} />
         <MonthlyStreamingActivity data={filteredData} />
         <MusicCharacteristics data={filteredData} />
