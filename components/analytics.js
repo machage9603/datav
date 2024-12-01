@@ -5,9 +5,8 @@ import { FilterBar } from './filter-bar'
 import { StreamingTrends } from './charts/streaming-trends'
 import { TopArtists } from './charts/top-artists'
 import { GenreDistribution } from './charts/genre-distribution'
-import { SongLengthVsStreams } from './charts/song-length-vs-streams'
+import { BPMVsStreams } from './charts/bpm-vs-streams'
 import { MonthlyStreamingActivity } from './charts/monthly-streaming-activity'
-import { ArtistPerformance } from './charts/artist-performance'
 import { MusicCharacteristics } from './charts/music-characteristics'
 import { GenreMusicCharacteristics } from './charts/genre-music-characteristics'
 import { useSpotifyData } from '@/hooks/use-spotify-data'
@@ -46,9 +45,8 @@ export function Analytics() {
         <StreamingTrends data={filteredData} />
         <TopArtists data={filteredData} />
         <GenreDistribution data={filteredData} />
-        <SongLengthVsStreams data={filteredData} />
+        <BPMVsStreams data={filteredData} />
         <MonthlyStreamingActivity data={filteredData} />
-        <ArtistPerformance data={filteredData} />
         <MusicCharacteristics data={filteredData} />
         <GenreMusicCharacteristics data={filteredData} />
       </div>

@@ -39,7 +39,7 @@ export function TopArtists({ data }) {
           <BarChart
             data={chartData}
             layout="vertical"
-            margin={{ left: 150, right: 20, top: 20, bottom: 20 }}
+            margin={{ left: 80, right: 20, top: 20, bottom: 20 }}
           >
             <CartesianGrid horizontal={false} />
             <XAxis
