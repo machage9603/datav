@@ -8,7 +8,6 @@ import { PlaylistDistribution } from './charts/playlist-distribution'
 import { BPMVsStreams } from './charts/bpm-vs-streams'
 import { MonthlyStreamingActivity } from './charts/monthly-streaming-activity'
 import { MusicCharacteristics } from './charts/music-characteristics'
-import { GenreMusicCharacteristics } from './charts/genre-music-characteristics'
 import { useSpotifyData } from '@/hooks/use-spotify-data'
 
 export function Analytics() {
@@ -48,7 +47,6 @@ export function Analytics() {
         <BPMVsStreams data={filteredData} />
         <MonthlyStreamingActivity data={filteredData} />
         <MusicCharacteristics data={filteredData} />
-        <GenreMusicCharacteristics data={filteredData} />
       </div>
     </div>
   )

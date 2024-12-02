@@ -1,7 +1,7 @@
 "use client"
-import { Pie, PieChart, Cell, ResponsiveContainer, Legend } from "recharts"
+import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer } from "@/components/ui/chart"
 
 export function PlaylistDistribution({ data }) {
   // Define playlist columns to track
@@ -21,72 +21,129 @@ export function PlaylistDistribution({ data }) {
     count: data.reduce((sum, song) => sum + (Number(song[column.key]) || 0), 0)
   }))
 
-  // Sort and take top 5
+  // Sort and take top 5, ensuring only entries with non-zero counts are included
   const chartData = playlistCounts
+    .filter(item => item.count > 0)
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
 
-  // Color palette
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
+  // Custom color palette with more distinct colors
+  const COLORS = [
+    '#3B82F6',  // Vibrant Blue
+    '#10B981',  // Emerald Green
+    '#F43F5E',  // Rose Red
+    '#6366F1',  // Indigo
+    '#F59E0B',  // Amber
+  ]
 
-  // Custom label renderer
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  // Custom label renderer with improved readability
+  const renderCustomizedLabel = ({ percent, x, y, midAngle }) => {
+    const radius = 1.2 // Slightly outside the pie slice
+    const RADIAN = Math.PI / 180
+    const cx = x + radius * Math.cos(-midAngle * RADIAN)
+    const cy = y + radius * Math.sin(-midAngle * RADIAN)
 
     return (
-      <text
-        x={x}
-        y={y}
-        fill="white"
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize="12px"
-        fontWeight="bold"
-      >
-        {`${percent.toFixed(0)}%`}
-      </text>
-    );
-  };
+      <>
+        <text
+          x={cx}
+          y={cy}
+          fill="rgba(0,0,0,0.7)"
+          textAnchor={x > cx ? 'start' : 'end'}
+          dominantBaseline="central"
+          fontWeight="bold"
+        >
+          {`${percent.toFixed(0)}%`}
+        </text>
+      </>
+    )
+  }
+
+  // Total appearances for context
+  const totalAppearances = chartData.reduce((sum, item) => sum + item.count, 0)
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Playlist Distribution</CardTitle>
-        <CardDescription>Top 5 Playlist/Chart Appearances</CardDescription>
+    <Card className="w-full shadow-2xl rounded-2xl overflow-hidden border-none">
+      <CardHeader className="bg-gradient-to-r from-blue-100 to-blue-200 p-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <CardTitle className="text-2xl font-bold text-gray-900">Playlist Distribution</CardTitle>
+            <CardDescription className="text-gray-600 mt-2">
+              Top Playlist and Chart Appearances
+            </CardDescription>
+          </div>
+          <div className="bg-blue-500 text-white px-4 py-2 rounded-full">
+            {chartData.length} Platforms
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
-        <div className="h-[350px] w-full">
+      <CardContent className="p-6 pt-4">
+        <div className="h-[500px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
+              <defs>
+                {COLORS.map((color, index) => (
+                  <linearGradient
+                    key={`gradient-${index}`}
+                    id={`gradient-${index}`}
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%"
+                  >
+                    <stop offset="0%" stopColor={color} stopOpacity={0.7} />
+                    <stop offset="100%" stopColor={color} stopOpacity={0.9} />
+                  </linearGradient>
+                ))}
+              </defs>
+
               <Pie
                 data={chartData}
                 dataKey="count"
                 nameKey="name"
                 cx="50%"
                 cy="50%"
+                innerRadius="50%"
                 outerRadius="80%"
+                paddingAngle={3}
                 label={renderCustomizedLabel}
-                labelLine={false}
+                labelLine
               >
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={`url(#gradient-${index})`}
+                    stroke="white"
+                    strokeWidth={2}
+                  />
                 ))}
               </Pie>
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    formatter={(value) => [value.toLocaleString(), 'Appearances']}
-                  />
-                }
+
+              <Tooltip
+                formatter={(value, name) => [
+                  value.toLocaleString(),
+                  `${name} Appearances`
+                ]}
+                contentStyle={{
+                  borderRadius: '12px',
+                  backgroundColor: 'rgba(255,255,255,0.9)'
+                }}
               />
+
               <Legend
-                layout="horizontal"
-                verticalAlign="bottom"
-                align="center"
-                wrapperStyle={{ paddingTop: '10px' }}
+                layout="vertical"
+                verticalAlign="middle"
+                align="right"
+                iconType="circle"
+                wrapperStyle={{
+                  paddingLeft: '20px',
+                  fontSize: '14px',
+                  color: 'rgba(0,0,0,0.7)'
+                }}
+                formatter={(value, entry) => {
+                  const percentage = (entry.payload.count / totalAppearances * 100).toFixed(1)
+                  return `${value} (${percentage}%)`
+                }}
               />
             </PieChart>
           </ResponsiveContainer>
