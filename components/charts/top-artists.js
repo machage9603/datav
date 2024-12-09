@@ -1,17 +1,19 @@
 "use client"
 
+import React, { useState } from 'react'
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Cell } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartContainer } from "@/components/ui/chart"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function TopArtists({ data }) {
+  // State to manage number of top artists
+  const [topCount, setTopCount] = useState(10)
+
   // Robust data transformation
   const artistStreams = data.reduce((acc, song) => {
-    // Use 'artist(s)_name' instead of 'artist_name'
     const artistNames = song['artist(s)_name']?.split(', ') || ['Unknown'];
     const streams = Number(song.streams) || 0;
 
-    // If multiple artists, distribute streams equally
     artistNames.forEach(artist => {
       acc[artist] = (acc[artist] || 0) + (streams / artistNames.length);
     });
@@ -19,14 +21,14 @@ export function TopArtists({ data }) {
     return acc;
   }, {})
 
-  // Prepare chart data with explicit mapping
+  // Prepare chart data with explicit mapping and dynamic slicing
   const chartData = Object.entries(artistStreams)
     .map(([name, value]) => ({
       name,
       streams: value
     }))
     .sort((a, b) => b.streams - a.streams)
-    .slice(0, 10);
+    .slice(0, topCount);
 
   // Formatter for large numbers
   const formatStreamCount = (value) => {
@@ -38,16 +40,30 @@ export function TopArtists({ data }) {
 
   return (
     <Card className="w-full shadow-2xl rounded-2xl overflow-hidden border-none">
-      <CardHeader className="bg-gradient-to-r from-blue-100 to-blue-200 p-6">
+      <CardHeader className="bg-gradient-to-r from-indigo-100 to-indigo-200 p-6">
         <div className="flex justify-between items-center">
           <div>
             <CardTitle className="text-2xl font-bold text-gray-900">Top Artists</CardTitle>
             <CardDescription className="text-gray-600 mt-2">
-              Top 10 artists by total stream count
+              Top Artists by Total Stream Count
             </CardDescription>
           </div>
-          <div className="bg-blue-500 text-white px-4 py-2 rounded-full">
-            {chartData.length} Artists
+          <div className="flex items-center space-x-4">
+            <Select value={topCount.toString()} onValueChange={(value) => setTopCount(Number(value))}>
+              <SelectTrigger className="w-[120px] bg-indigo-500 text-white">
+                <SelectValue placeholder="Select Top" />
+              </SelectTrigger>
+              <SelectContent>
+                {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    Top {num}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="bg-indigo-600 text-white px-4 py-2 rounded-full">
+              {chartData.length} Artists
+            </div>
           </div>
         </div>
       </CardHeader>
@@ -61,37 +77,38 @@ export function TopArtists({ data }) {
             >
               <defs>
                 <linearGradient id="artistGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.7} />
-                  <stop offset="100%" stopColor="#2563EB" stopOpacity={0.9} />
+                  <stop offset="0%" stopColor="#6366F1" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#4338CA" stopOpacity={1} />
                 </linearGradient>
               </defs>
 
               <CartesianGrid
                 horizontal={false}
-                stroke="rgba(0,0,0,0.1)"
+                stroke="rgba(0,0,0,0.15)"
+                strokeDasharray="3 3"
               />
 
               <XAxis
                 type="number"
                 tickFormatter={formatStreamCount}
-                axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-                tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-                tick={{ fontSize: 12, fill: 'rgba(0,0,0,0.6)' }}
+                axisLine={{ stroke: 'rgba(0,0,0,0.3)' }}
+                tickLine={{ stroke: 'rgba(0,0,0,0.3)' }}
+                tick={{ fontSize: 12, fill: 'rgba(0,0,0,0.7)' }}
               />
 
               <YAxis
                 dataKey="name"
                 type="category"
                 interval={0}
-                width={150}
-                axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-                tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-                tick={{ fontSize: 12, fill: 'rgba(0,0,0,0.6)' }}
+                width={topCount > 50 ? 20 : 150}
+                axisLine={{ stroke: 'rgba(0,0,0,0.3)' }}
+                tickLine={{ stroke: 'rgba(0,0,0,0.3)' }}
+                tick={topCount > 50 ? false : { fontSize: 12, fill: 'rgba(0,0,0,0.7)' }}
               />
 
               <Tooltip
                 formatter={(value) => [formatStreamCount(value), 'Total Streams']}
-                cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
+                cursor={{ fill: 'rgba(99, 102, 241, 0.2)' }}
               />
 
               <Bar
@@ -101,7 +118,7 @@ export function TopArtists({ data }) {
                 {chartData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fillOpacity={0.8}
+                    fillOpacity={0.9}
                     stroke="white"
                     strokeWidth={1}
                   />
