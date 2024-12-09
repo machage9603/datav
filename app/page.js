@@ -6,7 +6,7 @@ export default function AnalyticsPage() {
   return (
     <>
       <main className="container mx-auto p-4">
-        <Suspense fallback={<SpotifyLoader />}>
+        <Suspense fallback={< SpotifyLoader />}>
           <Analytics />
         </Suspense>
       </main>

@@ -18,12 +18,14 @@ const yearTickFormatter = (year) => {
 }
 
 export function StreamingTrends({ data }) {
-  // Ensure data is processed correctly
-  const streamsByYear = data.reduce((acc, song) => {
-    const year = song.released_year // Changed from released_date
-    acc[year] = (acc[year] || 0) + song.streams
-    return acc
-  }, {})
+  // Filter out data before 2006 and aggregate streams
+  const streamsByYear = data
+    .filter(song => song.released_year >= 2006)
+    .reduce((acc, song) => {
+      const year = song.released_year
+      acc[year] = (acc[year] || 0) + song.streams
+      return acc
+    }, {})
 
   const chartData = Object.entries(streamsByYear)
     .map(([year, streams]) => ({ year: parseInt(year), streams }))
