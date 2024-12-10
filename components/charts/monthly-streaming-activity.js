@@ -108,7 +108,7 @@ export function MonthlyStreamingActivity({ data }) {
           </div>
           <div className="flex items-center space-x-4">
             <div className="bg-purple-500 text-white px-4 py-2 rounded-full">
-              {activeMonths} Months
+              {activeMonths} Actual Months
             </div>
             <Select
               value={selectedYear || ''}
@@ -204,6 +204,27 @@ export function MonthlyStreamingActivity({ data }) {
               />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+        {/* Color Legend */}
+        <div className="flex justify-center space-x-6 mt-4 p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center">
+            <div
+              className="w-6 h-4 mr-2 rounded"
+              style={{
+                background: 'linear-gradient(to bottom, #8884d8 5%, #8884d8 95%)'
+              }}
+            />
+            <span className="text-sm text-gray-700">Actual Streams</span>
+          </div>
+          <div className="flex items-center">
+            <div
+              className="w-6 h-4 mr-2 rounded"
+              style={{
+                background: 'linear-gradient(to bottom, #82ca9d 5%, #82ca9d 95%)'
+              }}
+            />
+            <span className="text-sm text-gray-700">Estimated Streams</span>
+          </div>
         </div>
 
         {/* Summary Section */}

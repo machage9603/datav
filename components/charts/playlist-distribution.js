@@ -36,9 +36,12 @@ export function PlaylistDistribution({ data }) {
     '#F59E0B',  // Amber
   ]
 
-  // Custom label renderer with improved readability
+  // Total appearances for context
+  const totalAppearances = chartData.reduce((sum, item) => sum + item.count, 0)
+
+  // Custom label renderer with percentage from total appearances
   const renderCustomizedLabel = ({ name, count }) => {
-    const percentage = ((count / totalAppearances) * 100).toFixed(1); // Consistent formula
+    const percentage = ((count / totalAppearances) * 100).toFixed(1);
     return (
       <text
         fill="rgba(0,0,0,0.7)"
@@ -50,10 +53,6 @@ export function PlaylistDistribution({ data }) {
       </text>
     );
   };
-
-
-  // Total appearances for context
-  const totalAppearances = chartData.reduce((sum, item) => sum + item.count, 0)
 
   return (
     <Card className="w-full shadow-2xl rounded-2xl overflow-hidden border-none">
