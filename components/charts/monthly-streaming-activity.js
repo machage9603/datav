@@ -33,18 +33,18 @@ export function MonthlyStreamingActivity({ data }) {
 
     // Hardcoded potential streaming values
     const hardcodedStreams = {
-      0: 5000,   // January
-      1: 3000,   // February
-      2: 7500,   // March
-      3: 2000,   // April
-      4: 1500,   // May
-      5: 6000,   // June
-      6: 8000,   // July
-      7: 4000,   // August
-      8: 2500,   // September
-      9: 1000,   // October
-      10: 3500,  // November
-      11: 9000   // December
+      0: 500000000,   // January
+      1: 300000000,   // February
+      2: 705000000,   // March
+      3: 820000000,   // April
+      4: 105000000,   // May
+      5: 690000000,   // June
+      6: 880000000,   // July
+      7: 940000000,   // August
+      8: 225000000,   // September
+      9: 81000000,   // October
+      10: 993500000,  // November
+      11: 890000000   // December
     }
 
     return Array.from({ length: 12 }, (_, month) => {
@@ -54,10 +54,18 @@ export function MonthlyStreamingActivity({ data }) {
 
       const calculatedStreams = monthData.reduce((sum, song) => sum + (Number(song.streams) || 0), 0)
 
+      // Prioritize actual streams, fall back to hardcoded if zero
+      const streams = calculatedStreams > 0
+        ? calculatedStreams
+        : hardcodedStreams[month]
+
       return {
         month: new Date(2000, month, 1).toLocaleString('default', { month: 'short' }),
-        streams: calculatedStreams > 0 ? calculatedStreams : hardcodedStreams[month],
-        hasActualStreams: calculatedStreams > 0
+        streams: streams,
+        hasActualStreams: calculatedStreams > 0,
+        fill: calculatedStreams > 0
+          ? "url(#colorStreamsActual)"
+          : "url(#colorStreamsPredicted)"
       }
     })
   }, [validData, selectedYear])
@@ -86,6 +94,8 @@ export function MonthlyStreamingActivity({ data }) {
     return null
   }
 
+  console.log('BarChart Data:', monthlyData);
+
   return (
     <Card className="w-full shadow-2xl rounded-2xl overflow-hidden border-none">
       <CardHeader className="bg-gradient-to-r from-purple-100 to-purple-200 p-6">
@@ -98,7 +108,7 @@ export function MonthlyStreamingActivity({ data }) {
           </div>
           <div className="flex items-center space-x-4">
             <div className="bg-purple-500 text-white px-4 py-2 rounded-full">
-              {activeMonths} Months with Actual Streams
+              {activeMonths} Months
             </div>
             <Select
               value={selectedYear || ''}
@@ -139,6 +149,10 @@ export function MonthlyStreamingActivity({ data }) {
                   <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
                   <stop offset="95%" stopColor="#82ca9d" stopOpacity={0.3}/>
                 </linearGradient>
+                <linearGradient id="colorStreamsHardcoded" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="5%" stopColor="#FF6B6B" stopOpacity={0.8}/>
+    <stop offset="95%" stopColor="#FF6B6B" stopOpacity={0.3}/>
+  </linearGradient>
               </defs>
 
               <CartesianGrid
@@ -185,12 +199,7 @@ export function MonthlyStreamingActivity({ data }) {
 
               <Bar
                 dataKey="streams"
-                fill={(data) =>
-                  data.hasActualStreams
-                    ? "url(#colorStreamsActual)"
-                    : "url(#colorStreamsPredicted)"
-                }
-                fillOpacity={0.7}
+                fill={(entry) => entry.payload.fill}
                 barSize={30}
               />
             </BarChart>
