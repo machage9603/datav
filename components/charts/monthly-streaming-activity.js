@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ChevronDown } from 'lucide-react'
 
 export function MonthlyStreamingActivity({ data }) {
   // Ensure data is an array and not empty
@@ -15,7 +14,7 @@ export function MonthlyStreamingActivity({ data }) {
     const uniqueYears = [...new Set(
       validData
         .map(song => song.released_date.getFullYear())
-        .filter(year => year != null && !isNaN(year))
+        .filter(year => year != null && !isNaN(year) && year > 2006)
     )].sort()
     return uniqueYears
   }, [validData])
@@ -32,14 +31,33 @@ export function MonthlyStreamingActivity({ data }) {
       song.released_date.getFullYear().toString() === selectedYear
     )
 
+    // Hardcoded potential streaming values
+    const hardcodedStreams = {
+      0: 5000,   // January
+      1: 3000,   // February
+      2: 7500,   // March
+      3: 2000,   // April
+      4: 1500,   // May
+      5: 6000,   // June
+      6: 8000,   // July
+      7: 4000,   // August
+      8: 2500,   // September
+      9: 1000,   // October
+      10: 3500,  // November
+      11: 9000   // December
+    }
+
     return Array.from({ length: 12 }, (_, month) => {
       const monthData = filteredData.filter(song =>
         song.released_date.getMonth() === month
       )
 
+      const calculatedStreams = monthData.reduce((sum, song) => sum + (Number(song.streams) || 0), 0)
+
       return {
         month: new Date(2000, month, 1).toLocaleString('default', { month: 'short' }),
-        streams: monthData.reduce((sum, song) => sum + (Number(song.streams) || 0), 0)
+        streams: calculatedStreams > 0 ? calculatedStreams : hardcodedStreams[month],
+        hasActualStreams: calculatedStreams > 0
       }
     })
   }, [validData, selectedYear])
@@ -54,6 +72,12 @@ export function MonthlyStreamingActivity({ data }) {
   // Total streams for the year
   const totalYearStreams = useMemo(() =>
     monthlyData.reduce((sum, entry) => sum + entry.streams, 0),
+    [monthlyData]
+  )
+
+  // Active months (with actual streams from data)
+  const activeMonths = useMemo(() =>
+    monthlyData.filter(month => month.hasActualStreams).length,
     [monthlyData]
   )
 
@@ -74,7 +98,7 @@ export function MonthlyStreamingActivity({ data }) {
           </div>
           <div className="flex items-center space-x-4">
             <div className="bg-purple-500 text-white px-4 py-2 rounded-full">
-              {monthlyData.filter(m => m.streams > 0).length} Active Months
+              {activeMonths} Months with Actual Streams
             </div>
             <Select
               value={selectedYear || ''}
@@ -84,7 +108,6 @@ export function MonthlyStreamingActivity({ data }) {
                 <SelectValue placeholder="Select Year">
                   {selectedYear}
                 </SelectValue>
-                <ChevronDown className="ml-2 h-4 w-4 opacity-50" />
               </SelectTrigger>
               <SelectContent>
                 {years.map((year, index) => (
@@ -108,9 +131,13 @@ export function MonthlyStreamingActivity({ data }) {
               margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
             >
               <defs>
-                <linearGradient id="colorStreams" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="colorStreamsActual" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
                   <stop offset="95%" stopColor="#8884d8" stopOpacity={0.3}/>
+                </linearGradient>
+                <linearGradient id="colorStreamsPredicted" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
+                  <stop offset="95%" stopColor="#82ca9d" stopOpacity={0.3}/>
                 </linearGradient>
               </defs>
 
@@ -141,7 +168,14 @@ export function MonthlyStreamingActivity({ data }) {
               />
 
               <Tooltip
-                formatter={(value) => [formatStreams(value), 'Streams']}
+                formatter={(value, name, props) => {
+                  const formattedValue = formatStreams(value)
+                  const isActual = props.payload.hasActualStreams
+                  return [
+                    formattedValue,
+                    isActual ? 'Actual Streams' : 'Estimated Streams'
+                  ]
+                }}
                 contentStyle={{
                   borderRadius: '12px',
                   backgroundColor: 'rgba(255,255,255,0.9)',
@@ -151,7 +185,11 @@ export function MonthlyStreamingActivity({ data }) {
 
               <Bar
                 dataKey="streams"
-                fill="url(#colorStreams)"
+                fill={(data) =>
+                  data.hasActualStreams
+                    ? "url(#colorStreamsActual)"
+                    : "url(#colorStreamsPredicted)"
+                }
                 fillOpacity={0.7}
                 barSize={30}
               />

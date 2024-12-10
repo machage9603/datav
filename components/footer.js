@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { Heart } from 'lucide-react'
 
 export function Footer() {
   return (
@@ -19,7 +18,6 @@ export function Footer() {
             className="flex items-center space-x-1 hover:text-green-600 transition-colors"
           >
             <span className="text-sm font-medium">Kaggle</span>
-            <Heart className="w-4 h-4 fill-current text-red-500" />
           </Link>
         </div>
       </div>

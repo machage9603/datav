@@ -37,27 +37,20 @@ export function PlaylistDistribution({ data }) {
   ]
 
   // Custom label renderer with improved readability
-  const renderCustomizedLabel = ({ percent, x, y, midAngle }) => {
-    const radius = 1.2 // Slightly outside the pie slice
-    const RADIAN = Math.PI / 180
-    const cx = x + radius * Math.cos(-midAngle * RADIAN)
-    const cy = y + radius * Math.sin(-midAngle * RADIAN)
-
+  const renderCustomizedLabel = ({ name, count }) => {
+    const percentage = ((count / totalAppearances) * 100).toFixed(1); // Consistent formula
     return (
-      <>
-        <text
-          x={cx}
-          y={cy}
-          fill="rgba(0,0,0,0.7)"
-          textAnchor={x > cx ? 'start' : 'end'}
-          dominantBaseline="central"
-          fontWeight="bold"
-        >
-          {`${percent.toFixed(0)}%`}
-        </text>
-      </>
-    )
-  }
+      <text
+        fill="rgba(0,0,0,0.7)"
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontWeight="bold"
+      >
+        {`${percentage}%`}
+      </text>
+    );
+  };
+
 
   // Total appearances for context
   const totalAppearances = chartData.reduce((sum, item) => sum + item.count, 0)
