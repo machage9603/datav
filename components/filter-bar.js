@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 export function FilterBar({ data, filters, setFilters }) {
-  // Use stable memoized values with unique keys
+  // Keep these memoized calculations for filtering logic
   const genres = useMemo(() => {
     const uniqueGenres = ['All Genres', ...new Set(data.map(song => song.genre))];
     return uniqueGenres.filter(genre => genre != null);
@@ -22,6 +22,7 @@ export function FilterBar({ data, filters, setFilters }) {
   }, [data]);
 
   const handleReset = () => {
+    // reset logic including genre and artist
     setFilters({
       genre: 'All Genres',
       artist: 'All Artists',
@@ -32,46 +33,6 @@ export function FilterBar({ data, filters, setFilters }) {
 
   return (
     <div className="flex flex-wrap gap-4 items-end">
-      <div className="w-full md:w-auto">
-        <Select
-          value={filters.genre}
-          onValueChange={(value) => setFilters(prev => ({ ...prev, genre: value }))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Genre" />
-          </SelectTrigger>
-          <SelectContent>
-            {genres.map((genre, index) => (
-              <SelectItem
-                key={`genre-${genre}-${index}`}
-                value={genre}
-              >
-                {genre}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="w-full md:w-auto">
-        <Select
-          value={filters.artist}
-          onValueChange={(value) => setFilters(prev => ({ ...prev, artist: value }))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select Artist" />
-          </SelectTrigger>
-          <SelectContent>
-            {artists.map((artist, index) => (
-              <SelectItem
-                key={`artist-${artist}-${index}`}
-                value={artist}
-              >
-                {artist}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
       <div className="w-full md:w-auto">
         <Input
           type="date"
@@ -88,7 +49,7 @@ export function FilterBar({ data, filters, setFilters }) {
           placeholder="End Date"
         />
       </div>
-      <Button onClick={handleReset}>Reset Filters</Button>
+      <Button onClick={handleReset}>Reset</Button>
     </div>
   )
 }
