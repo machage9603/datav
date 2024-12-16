@@ -1,9 +1,17 @@
 "use client"
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts"
+import { useState, useMemo } from 'react'
+import {
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+  ResponsiveContainer, Tooltip as RechartsTooltip,
+  LineChart, Line, XAxis, YAxis, CartesianGrid
+} from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Info } from 'lucide-react'
+import { Info, Filter } from 'lucide-react'
+import { Slider } from "@/components/ui/slider"
 
 export function MusicCharacteristics({ data }) {
+  const [dataRange, setDataRange] = useState([0, data.length]);
+
   const characteristics = [
     { key: 'danceability_%', label: 'Danceability', description: 'How suitable a track is for dancing' },
     { key: 'valence_%', label: 'Valence', description: 'Musical positiveness conveyed by a track' },
@@ -14,10 +22,15 @@ export function MusicCharacteristics({ data }) {
     { key: 'speechiness_%', label: 'Speechiness', description: 'Spoken words in the track' }
   ]
 
+  // Filter data based on range
+  const filteredData = useMemo(() => {
+    return data.slice(dataRange[0], dataRange[1]);
+  }, [data, dataRange]);
+
   // Safely calculate average characteristics
   const averageCharacteristics = characteristics.reduce((acc, char) => {
-    acc[char.label] = data && data.length > 0
-      ? data.reduce((sum, song) => sum + (parseFloat(song[char.key]) || 0), 0) / data.length
+    acc[char.label] = filteredData && filteredData.length > 0
+      ? filteredData.reduce((sum, song) => sum + (parseFloat(song[char.key]) || 0), 0) / filteredData.length
       : 0
     return acc
   }, {})
@@ -26,6 +39,15 @@ export function MusicCharacteristics({ data }) {
     characteristic: char,
     value: value
   }))
+
+  // Prepare data for parallel coordinates
+  const parallelData = filteredData.map(song => {
+    const processedSong = { name: song.name }
+    characteristics.forEach(char => {
+      processedSong[char.label] = parseFloat(song[char.key]) || 0
+    })
+    return processedSong
+  })
 
   // Calculate total characteristics score
   const totalScore = chartData.reduce((sum, item) => sum + item.value, 0)
@@ -42,11 +64,30 @@ export function MusicCharacteristics({ data }) {
             </CardDescription>
           </div>
           <div className="bg-teal-500 text-white px-4 py-2 rounded-full">
-            {chartData.length} Features
+            {filteredData.length} Features
           </div>
         </div>
       </CardHeader>
       <CardContent className="p-6 pt-4">
+        {/* Data Range Slider */}
+        <div className="mb-6">
+          <div className="flex items-center mb-2">
+            <Filter className="mr-2 h-5 w-5 text-teal-600" />
+            <p className="text-sm text-gray-700">Data Range Filter</p>
+          </div>
+          <Slider
+            defaultValue={[0, data.length]}
+            max={data.length}
+            step={1}
+            onValueChange={(value) => setDataRange(value)}
+            className="w-full"
+          />
+          <div className="text-xs text-gray-600 mt-2">
+            Showing {dataRange[0]} to {dataRange[1]} of {data.length} tracks
+          </div>
+        </div>
+
+        {/* Radar Chart */}
         <div className="h-[500px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart
@@ -83,7 +124,7 @@ export function MusicCharacteristics({ data }) {
                 strokeWidth={2}
               />
 
-              <Tooltip
+              <RechartsTooltip
                 content={({ payload }) => {
                   if (payload && payload.length) {
                     const item = payload[0].payload
@@ -102,6 +143,49 @@ export function MusicCharacteristics({ data }) {
                 }}
               />
             </RadarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Parallel Coordinates Chart */}
+        <div className="mt-8 h-[400px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={parallelData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            >
+              <CartesianGrid
+                horizontal={false}
+                stroke="rgba(79,209,197,0.2)"
+                strokeDasharray="3 3"
+              />
+              <XAxis
+                dataKey="name"
+                interval="preserveStartEnd"
+                tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.7)' }}
+              />
+
+              {characteristics.map((char, index) => (
+                <Line
+                  key={char.label}
+                  type="monotone"
+                  dataKey={char.label}
+                  stroke={`rgba(79,209,197,${1 - index * 0.15})`}
+                  strokeWidth={2}
+                  dot={false}
+                />
+              ))}
+
+              <YAxis
+                domain={[0, 100]}
+                tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.6)' }}
+              />
+
+              <RechartsTooltip
+                contentStyle={{ backgroundColor: 'white', border: 'none', borderRadius: '12px', padding: '10px' }}
+                itemStyle={{ color: 'gray' }}
+                labelStyle={{ fontWeight: 'bold', color: 'black' }}
+              />
+            </LineChart>
           </ResponsiveContainer>
         </div>
 
