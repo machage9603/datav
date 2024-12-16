@@ -14,6 +14,7 @@ export function BPMVsStreams({ data }) {
   ]
 
   // Format large numbers to be more readable
+  //refactor this later
   const formatStreams = (streams) => {
     if (streams >= 1000000) {
       return `${(streams / 1000000).toFixed(1)}M`
@@ -38,7 +39,7 @@ export function BPMVsStreams({ data }) {
         x: Number(song.bpm),
         y: streams,
         name: song.track_name,
-        artist: song.artist,
+        artist: song['artist(s)_name'],
         bpm: Number(song.bpm),
         streams: streams,
         color: COLORS[index % COLORS.length]
