@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react'
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, Tooltip as RechartsTooltip,
-  LineChart, Line, XAxis, YAxis, CartesianGrid
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Label
 } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Info, Filter } from 'lucide-react'
@@ -113,7 +113,14 @@ export function MusicCharacteristics({ data }) {
                 domain={[0, 100]}
                 tickCount={5}
                 tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.6)' }}
-              />
+              >
+                <Label
+                  value="Percentage (%)"
+                  position="outside"
+                  fill="rgba(0,0,0,0.6)"
+                  fontSize={10}
+                />
+              </PolarRadiusAxis>
 
               <Radar
                 name="Average Characteristics"
@@ -162,7 +169,14 @@ export function MusicCharacteristics({ data }) {
                 dataKey="name"
                 interval="preserveStartEnd"
                 tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.7)' }}
-              />
+              >
+                <Label
+                  value="Tracks"
+                  offset={-10}
+                  position="insideBottom"
+                  fill="rgba(0,0,0,0.6)"
+                />
+              </XAxis>
 
               {characteristics.map((char, index) => (
                 <Line
@@ -178,7 +192,15 @@ export function MusicCharacteristics({ data }) {
               <YAxis
                 domain={[0, 100]}
                 tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.6)' }}
-              />
+              >
+                <Label
+                  value="Characteristic Intensity (%)"
+                  angle={-90}
+                  position="insideLeft"
+                  fill="rgba(0,0,0,0.6)"
+                  style={{ textAnchor: 'middle' }}
+                />
+              </YAxis>
 
               <RechartsTooltip
                 contentStyle={{ backgroundColor: 'white', border: 'none', borderRadius: '12px', padding: '10px' }}
