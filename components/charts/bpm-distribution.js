@@ -2,6 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
 
 export function BPMHistogram({ data }) {
   // Enhanced color palette with gradients
@@ -80,7 +81,9 @@ export function BPMHistogram({ data }) {
       <CardHeader className="bg-gradient-to-r from-indigo-100 to-indigo-200 p-6">
         <div className="flex justify-between items-center">
           <div>
+            <Link href={"/hist"} className="block">
             <CardTitle className="text-2xl font-bold text-gray-900">BPM Distribution</CardTitle>
+            </Link>
             <CardDescription className="text-gray-600 mt-2">
               Exploring Song Tempo Distribution and Streaming Popularity
             </CardDescription>
@@ -165,7 +168,7 @@ export function BPMHistogram({ data }) {
               />
 
               <Bar dataKey="totalStreams">
-                {histogramData.map((entry, index) => (
+                {histogramData.map((_entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={`url(#gradient-${index % COLORS.length})`}

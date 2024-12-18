@@ -1,5 +1,5 @@
 "use client"
-
+import Link from "next/link"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
@@ -32,6 +32,7 @@ export function StreamingTrends({ data }) {
     .sort((a, b) => a.year - b.year)
 
   return (
+    <Link href="/line" className="block">
     <Card className="w-full shadow-2xl rounded-2xl overflow-hidden border-none">
       <CardHeader className="bg-gradient-to-r from-blue-100 to-blue-200 p-6">
         <div className="flex justify-between items-center">
@@ -118,5 +119,6 @@ export function StreamingTrends({ data }) {
         </div>
       </CardContent>
     </Card>
+    </Link>
   )
 }
