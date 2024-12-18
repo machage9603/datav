@@ -1,5 +1,6 @@
 "use client"
 
+import Link from 'next/link'
 import { Scatter, ScatterChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -54,7 +55,9 @@ export function BPMVsStreams({ data }) {
       <CardHeader className="bg-gradient-to-r from-indigo-100 to-indigo-200 p-6">
         <div className="flex justify-between items-center">
           <div>
+            <Link href="/scatter" className="block">
             <CardTitle className="text-2xl font-bold text-gray-900">BPM vs Streams</CardTitle>
+            </Link>
             <CardDescription className="text-gray-600 mt-2">
               Exploring the Relationship Between Song Tempo and Popularity
             </CardDescription>
