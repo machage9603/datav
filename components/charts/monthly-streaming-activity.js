@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React, { useState, useMemo } from 'react'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -101,7 +102,9 @@ export function MonthlyStreamingActivity({ data }) {
       <CardHeader className="bg-gradient-to-r from-purple-100 to-purple-200 p-6">
         <div className="flex justify-between items-center">
           <div>
+            <Link href="/barto" className="blocked">
             <CardTitle className="text-2xl font-bold text-gray-900">Monthly Streaming Activity</CardTitle>
+            </Link>
             <CardDescription className="text-gray-600 mt-2">
               Streams Distribution Across Months
             </CardDescription>
