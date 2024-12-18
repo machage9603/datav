@@ -1,4 +1,6 @@
 "use client"
+
+import Link from 'next/link'
 import { useState, useMemo } from 'react'
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -58,7 +60,9 @@ export function MusicCharacteristics({ data }) {
       <CardHeader className="bg-gradient-to-r from-teal-100 to-teal-200 p-6">
         <div className="flex justify-between items-center">
           <div>
+            <Link href="/radar" className="block">
             <CardTitle className="text-2xl font-bold text-gray-900">Music Characteristics</CardTitle>
+            </Link>
             <CardDescription className="text-gray-600 mt-2">
               Comprehensive Analysis of Musical Features
             </CardDescription>
