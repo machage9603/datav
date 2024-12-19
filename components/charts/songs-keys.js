@@ -1,4 +1,6 @@
 "use client"
+
+import Link from "next/link"
 import {
   BarChart,
   Bar,
@@ -33,7 +35,9 @@ export function MusicKeyHistogram({ data }) {
       <CardHeader className="bg-gradient-to-r from-purple-100 to-purple-200 p-6">
         <div className="flex justify-between items-center">
           <div>
+            <Link href="/histo" className="block">
             <CardTitle className="text-2xl font-bold text-gray-900">Music Key Distribution</CardTitle>
+            </Link>
             <CardDescription className="text-gray-600 mt-2">
               Frequency of Songs by Musical Key
             </CardDescription>
