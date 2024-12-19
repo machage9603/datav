@@ -1,4 +1,5 @@
 "use client"
+import Link from "next/link"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -31,9 +32,11 @@ export function MusicReleaseYearsChart({ data }) {
   return (
     <Card className="w-full shadow-2xl rounded-2xl overflow-hidden border-none">
       <CardHeader className="bg-gradient-to-r from-blue-100 to-blue-200 p-6">
+        <Link href="/lineto" className="block">
         <CardTitle className="text-2xl font-bold text-gray-900">
           Music Release Years Distribution
         </CardTitle>
+        </Link>
       </CardHeader>
       <CardContent className="p-6">
         <div className="h-[400px] w-full">
