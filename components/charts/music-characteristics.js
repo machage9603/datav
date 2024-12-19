@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState, useMemo } from 'react'
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-  ResponsiveContainer, Tooltip as RechartsTooltip,
+  ResponsiveContainer, Tooltip as RechartsTooltip, Legend,
   LineChart, Line, XAxis, YAxis, CartesianGrid, Label
 } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -23,6 +23,16 @@ export function MusicCharacteristics({ data }) {
     { key: 'liveness_%', label: 'Liveness', description: 'Presence of audience in the recording' },
     { key: 'speechiness_%', label: 'Speechiness', description: 'Spoken words in the track' }
   ]
+
+  const lineColors = {
+    Danceability: '#4FD1C5',    // Teal
+    Valence: '#3182CE',         // Blue
+    Energy: '#48BB78',          // Green
+    Acousticness: '#ED64A6',    // Pink
+    Instrumentalness: '#F6AD55', // Orange
+    Liveness: '#9F7AEA',        // Purple
+    Speechiness: '#F56565'      // Red
+  };
 
   // Filter data based on range
   const filteredData = useMemo(() => {
@@ -61,7 +71,9 @@ export function MusicCharacteristics({ data }) {
         <div className="flex justify-between items-center">
           <div>
             <Link href="/radar" className="block transition-transform duration-200 hover:scale-105 active:scale-95">
-            <CardTitle className="text-2xl font-bold text-gray-900  hover:text-blue-600 transition-colors duration-200">Music Characteristics</CardTitle>
+              <CardTitle className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors duration-200">
+                Music Characteristics
+              </CardTitle>
             </Link>
             <CardDescription className="text-gray-600 mt-2">
               Comprehensive Analysis of Musical Features
@@ -106,12 +118,10 @@ export function MusicCharacteristics({ data }) {
                 strokeOpacity={0.5}
                 strokeDasharray="3 3"
               />
-
               <PolarAngleAxis
                 dataKey="characteristic"
                 tick={{ fontSize: 10, fill: 'rgba(0,0,0,0.7)' }}
               />
-
               <PolarRadiusAxis
                 angle={30}
                 domain={[0, 100]}
@@ -125,7 +135,6 @@ export function MusicCharacteristics({ data }) {
                   fontSize={10}
                 />
               </PolarRadiusAxis>
-
               <Radar
                 name="Average Characteristics"
                 dataKey="value"
@@ -134,7 +143,6 @@ export function MusicCharacteristics({ data }) {
                 fillOpacity={0.3}
                 strokeWidth={2}
               />
-
               <RechartsTooltip
                 content={({ payload }) => {
                   if (payload && payload.length) {
@@ -162,7 +170,7 @@ export function MusicCharacteristics({ data }) {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={parallelData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
             >
               <CartesianGrid
                 horizontal={false}
@@ -182,14 +190,15 @@ export function MusicCharacteristics({ data }) {
                 />
               </XAxis>
 
-              {characteristics.map((char, index) => (
+              {characteristics.map((char) => (
                 <Line
                   key={char.label}
                   type="monotone"
                   dataKey={char.label}
-                  stroke={`rgba(79,209,197,${1 - index * 0.15})`}
+                  stroke={lineColors[char.label]}
                   strokeWidth={2}
                   dot={false}
+                  name={char.label}
                 />
               ))}
 
@@ -205,6 +214,16 @@ export function MusicCharacteristics({ data }) {
                   style={{ textAnchor: 'middle' }}
                 />
               </YAxis>
+
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                wrapperStyle={{
+                  paddingTop: "20px",
+                  paddingBottom: "20px",
+                  fontSize: "12px"
+                }}
+              />
 
               <RechartsTooltip
                 contentStyle={{ backgroundColor: 'white', border: 'none', borderRadius: '12px', padding: '10px' }}

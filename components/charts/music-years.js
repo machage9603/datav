@@ -6,28 +6,33 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 export function MusicReleaseYearsChart({ data }) {
   // Group data by release year
   const yearCounts = data.reduce((acc, song) => {
-    const year = new Date(song.release_date).getFullYear()
-    acc[year] = (acc[year] || 0) + 1
+    const year = new Date(song.released_year).getFullYear()
+    if (year >= 2005) { // Only include years from 2005 onwards
+      acc[year] = (acc[year] || 0) + 1
+    }
     return acc
   }, {})
 
-  // Convert to chart-friendly format
+  // Convert to chart-friendly format and sort by year
   const chartData = Object.entries(yearCounts)
-    .map(([year, count]) => ({ year: parseInt(year), count }))
+    .map(([year, count]) => ({
+      year: parseInt(year),
+      '2005-2010': parseInt(year) >= 2005 && parseInt(year) <= 2010 ? count : null,
+      '2011-2015': parseInt(year) >= 2011 && parseInt(year) <= 2015 ? count : null,
+      '2016-2020': parseInt(year) >= 2016 && parseInt(year) <= 2020 ? count : null,
+      '2021+': parseInt(year) >= 2021 ? count : null,
+    }))
     .sort((a, b) => a.year - b.year)
 
-  // Color palette for years
-  const getYearColor = (year) => {
-    const baseColors = [
-      '#4FD1C5',   // Teal
-      '#3182CE',   // Blue
-      '#48BB78',   // Green
-      '#ED64A6',   // Pink
-      '#F6AD55',   // Orange
-      '#9F7AEA',   // Purple
-    ]
-    return baseColors[year % baseColors.length]
+  // Define colors for each period
+  const lineColors = {
+    '2005-2010': '#F0000', // Teal
+    '2011-2015': '#3182CE', // Blue
+    '2016-2020': '#48BB78', // Green
+    '2021+': '#ED64A6',     // Pink
   }
+
+  console.log(chartData);
 
   return (
     <Card className="w-full shadow-2xl rounded-2xl overflow-hidden border-none">
@@ -79,14 +84,20 @@ export function MusicReleaseYearsChart({ data }) {
                 labelStyle={{ fontWeight: 'bold' }}
               />
 
-              <Line
-                type="monotone"
-                dataKey="count"
-                stroke={getYearColor(chartData[0]?.year || 0)}
-                strokeWidth={3}
-                dot={{ r: 6 }}
-                activeDot={{ r: 8 }}
-              />
+
+              {Object.keys(lineColors).map((period) => (
+                <Line
+                  key={period}
+                  type="monotone"
+                  dataKey={period}
+                  name={period}
+                  stroke={lineColors[period]}
+                  strokeWidth={3}
+                  dot={{ r: 6 }}
+                  activeDot={{ r: 8 }}
+                  connectNulls
+                />
+              ))}
             </LineChart>
           </ResponsiveContainer>
         </div>
