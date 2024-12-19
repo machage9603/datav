@@ -102,8 +102,8 @@ export function MonthlyStreamingActivity({ data }) {
       <CardHeader className="bg-gradient-to-r from-purple-100 to-purple-200 p-6">
         <div className="flex justify-between items-center">
           <div>
-            <Link href="/barto" className="blocked">
-            <CardTitle className="text-2xl font-bold text-gray-900">Monthly Streaming Activity</CardTitle>
+            <Link href="/barto" className="blocked transition-transform duration-200 hover:scale-105 active:scale-95">
+            <CardTitle className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors duration-200">Monthly Streaming Activity</CardTitle>
             </Link>
             <CardDescription className="text-gray-600 mt-2">
               Streams Distribution Across Months

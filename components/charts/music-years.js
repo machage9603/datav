@@ -32,10 +32,13 @@ export function MusicReleaseYearsChart({ data }) {
   return (
     <Card className="w-full shadow-2xl rounded-2xl overflow-hidden border-none">
       <CardHeader className="bg-gradient-to-r from-blue-100 to-blue-200 p-6">
-        <Link href="/lineto" className="block">
-        <CardTitle className="text-2xl font-bold text-gray-900">
-          Music Release Years Distribution
-        </CardTitle>
+        <Link
+          href="/lineto"
+          className="block transition-transform duration-200 hover:scale-105 active:scale-95"
+        >
+          <CardTitle className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors duration-200">
+            Music Release Years Distribution
+          </CardTitle>
         </Link>
       </CardHeader>
       <CardContent className="p-6">

@@ -60,8 +60,8 @@ export function MusicCharacteristics({ data }) {
       <CardHeader className="bg-gradient-to-r from-teal-100 to-teal-200 p-6">
         <div className="flex justify-between items-center">
           <div>
-            <Link href="/radar" className="block">
-            <CardTitle className="text-2xl font-bold text-gray-900">Music Characteristics</CardTitle>
+            <Link href="/radar" className="block transition-transform duration-200 hover:scale-105 active:scale-95">
+            <CardTitle className="text-2xl font-bold text-gray-900  hover:text-blue-600 transition-colors duration-200">Music Characteristics</CardTitle>
             </Link>
             <CardDescription className="text-gray-600 mt-2">
               Comprehensive Analysis of Musical Features

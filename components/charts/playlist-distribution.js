@@ -61,8 +61,8 @@ export function PlaylistDistribution({ data }) {
       <CardHeader className="bg-gradient-to-r from-blue-100 to-blue-200 p-6">
         <div className="flex justify-between items-center">
           <div>
-            <Link href="/pie" className="block">
-            <CardTitle className="text-2xl font-bold text-gray-900">Playlist Distribution</CardTitle>
+            <Link href="/pie" className="block transition-transform duration-200 hover:scale-105 active:scale-95">
+            <CardTitle className="text-2xl font-bold text-gray-900  hover:text-blue-600 transition-colors duration-200">Playlist Distribution</CardTitle>
             </Link>
             <CardDescription className="text-gray-600 mt-2">
               Top Playlist and Chart Appearances
